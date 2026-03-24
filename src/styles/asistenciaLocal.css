@@ -1,0 +1,249 @@
+/* src/styles/asistenciaLocal.css */
+/* Contenedor */
+.page {
+  padding: 15px;
+  background: #ffffff;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Título */
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111827;
+  text-align: center;
+}
+
+/* Toolbar / botones */
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-icon {
+  font-size: 20px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ===========================
+   Botones
+=========================== */
+.btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  color: #111827;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover {
+  background: #f9fafb;
+}
+
+.btn.primary {
+  background: #7a0a0a;
+  color: #ffffff;
+  border-color: #7a0a0a;
+}
+.btn.primary:hover {
+  background: #6b0909;
+}
+
+/* Selectores y datepicker */
+.select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.select--date { gap: 12px; }
+.select__icon { font-size: 16px; }
+.select__label {
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Input buscar usuario */
+.user-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.input-search {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  min-width: 220px;
+  font-size: 14px;
+}
+.input-search:focus {
+  outline: none;
+  border-color: #7a0a0a;
+  box-shadow: 0 0 0 3px rgba(122, 10, 10, 0.15);
+}
+
+/* Export container */
+.export-container {
+  margin-left: auto;
+}
+
+/* Mensajes de error / loading */
+.error-message {
+  padding: 12px;
+  color: #7a0a0a;
+  background: #fef2f2;
+  border-radius: 6px;
+}
+.loading {
+  padding: 12px;
+  color: #374151;
+}
+
+/* ===========================
+   Tabla
+=========================== */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.table th {
+  background: #7a0a0a;
+  color: #ffffff;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #374151;
+}
+.table tr:nth-child(even) {
+  background: #fafafa;
+}
+.table tr:hover td {
+  background: #f3f4f6;
+}
+.empty {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* ===========================
+   Export
+=========================== */
+.btn-export {
+  padding: 10px 18px;
+  background: #065f46;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.btn-export:hover {
+  background: #047857;
+}
+
+/* Datepicker encima */
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}
+
+/* ===========================
+   Usuarios / accordion
+=========================== */
+.users-wrapper { margin-top: 6px; }
+.users-title {
+  margin: 6px 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Box usuario */
+.user-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+.user-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: #f9fafb;
+}
+.user-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.user-name {
+  font-weight: 700;
+  color: #111827;
+}
+.user-meta {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.user-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Body del accordion */
+.user-card__body {
+  padding: 12px;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+.user-card__body-header {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.user-meta-muted {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  .input-search { min-width: 140px; }
+  .export-container {
+    margin-left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .toolbar { gap: 8px; }
+}

@@ -1,0 +1,390 @@
+/* src/styles/asistenciaCampo.css */
+.page {
+  padding: 15px;
+  background: #ffffff;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111827;
+  text-align: center;
+}
+
+.att-card,
+.att-toolbar,
+.toolbar,
+.select,
+.period-tabs,
+.period-dd {
+  overflow: visible;
+}
+
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  color: #111827;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  background: #f9fafb;
+}
+
+.btn:focus {
+  outline: none;
+  border-color: #7a0a0a;
+  box-shadow: 0 0 0 3px rgba(122, 10, 10, 0.15);
+}
+
+.btn.primary {
+  background: #7a0a0a;
+  color: #ffffff;
+  border-color: #7a0a0a;
+}
+
+.btn.primary:hover {
+  background: #6b0909;
+}
+
+.period-tabs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.period-dd {
+  position: relative;
+  display: inline-flex;
+}
+
+.period-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  min-height: 36px;
+}
+
+.period-btn:hover {
+  background: #f9fafb;
+}
+
+.period-btn:focus {
+  outline: none;
+  border-color: #7a0a0a;
+  box-shadow: 0 0 0 3px rgba(122, 10, 10, 0.15);
+}
+
+.period-btn.active {
+  background: #7a0a0a;
+  color: #ffffff;
+  border-color: #7a0a0a;
+}
+
+.period-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 70;
+  min-width: 200px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(2, 8, 23, 0.14);
+  padding: 6px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.period-opt {
+  width: 100%;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  color: #111827;
+  transition: background 0.12s ease, transform 0.05s ease;
+  margin: 2px 0;
+}
+
+.period-opt:hover {
+  background: #f9fafb;
+  transform: translateY(-1px);
+}
+
+.period-opt.active {
+  background: #7a0a0a;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.estado-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.estado-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  border: 1.6px solid transparent;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.estado-pill .chev {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.estado-pill.pending {
+  color: #b58100;
+  border-color: rgba(181, 129, 0, 0.45);
+  background: rgba(181, 129, 0, 0.08);
+}
+
+.estado-pill.ok {
+  color: #065f46;
+  border-color: rgba(6, 95, 70, 0.45);
+  background: rgba(6, 95, 70, 0.08);
+}
+
+.estado-pill.bad {
+  color: #7a0a0a;
+  border-color: rgba(122, 10, 10, 0.45);
+  background: rgba(122, 10, 10, 0.08);
+}
+
+.estado-pill:hover {
+  transform: scale(1.03);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.estado-menu {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 50;
+  min-width: 160px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(2, 8, 23, 0.12);
+  padding: 6px;
+}
+
+.estado-option {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.04s ease;
+  margin: 2px 0;
+}
+
+.estado-option.pending {
+  color: #b58100;
+  border-color: rgba(181, 129, 0, 0.25);
+}
+.estado-option.ok {
+  color: #065f46;
+  border-color: rgba(6, 95, 70, 0.25);
+}
+.estado-option.bad {
+  color: #7a0a0a;
+  border-color: rgba(122, 10, 10, 0.25);
+}
+
+.estado-option:hover {
+  background: #f9fafb;
+  transform: translateY(-1px);
+}
+
+.estado-option.active {
+  background: #7a0a0a;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+:root {
+  --gpa-primary: #7a0a0a;
+  --gpa-primary-strong: #6b0909;
+  --gpa-accent: #b58100;
+  --gpa-text: #111827;
+  --gpa-muted: #6b7280;
+}
+
+.react-datepicker {
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.react-datepicker__header {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: var(--gpa-text);
+  font-weight: 800;
+}
+
+.react-datepicker__day-name {
+  color: var(--gpa-muted);
+  font-weight: 700;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: var(--gpa-primary);
+}
+
+.react-datepicker__day:hover {
+  background: rgba(122, 10, 10, 0.08);
+  border-radius: 10px;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background: rgba(181, 129, 0, 0.14);
+  color: var(--gpa-text);
+  border-radius: 10px;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range {
+  background: var(--gpa-primary);
+  color: #ffffff;
+  border-radius: 10px;
+}
+
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--in-selecting-range:hover,
+.react-datepicker__day--in-range:hover {
+  background: var(--gpa-primary-strong);
+}
+
+.react-datepicker__day--today {
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 2px rgba(122, 10, 10, 0.35);
+}
+
+.react-datepicker__triangle {
+  display: none;
+}
+
+.react-datepicker__day--outside-month {
+  color: rgba(128, 107, 107, 0.55);
+}
+
+.react-datepicker__day--disabled {
+  color: rgba(107, 114, 128, 0.35);
+}
+
+.react-datepicker__month-text:hover,
+.react-datepicker__quarter-text:hover,
+.react-datepicker__year-text:hover {
+  background: rgba(122, 10, 10, 0.08);
+  border-radius: 10px;
+}
+
+.react-datepicker__month-text--selected,
+.react-datepicker__quarter-text--selected,
+.react-datepicker__year-text--selected {
+  background: var(--gpa-primary);
+  color: #ffffff;
+  border-radius: 10px;
+}
+
+.react-datepicker__close-icon::after {
+  background: var(--gpa-primary);
+}
+:root {
+  --gpa-primary: #7a0a0a;
+  --gpa-primary-strong: #6b0909;
+}
+
+/* Día seleccionado (1 fecha) */
+.react-datepicker__day--selected {
+  background: var(--gpa-primary) !important;
+  color: #ffffff !important;
+  border-radius: 10px;
+}
+
+/* Rango (si usas selectsRange) */
+.react-datepicker__day--in-range,
+.react-datepicker__day--in-selecting-range {
+  background: var(--gpa-primary) !important;
+  color: #ffffff !important;
+  border-radius: 10px;
+}
+
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--in-range:hover,
+.react-datepicker__day--in-selecting-range:hover {
+  background: var(--gpa-primary-strong) !important;
+}
+
+
+@media (max-width: 720px) {
+  .period-tabs {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .period-dd {
+    width: 100%;
+  }
+
+  .period-btn {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .period-menu {
+    min-width: 100%;
+  }
+
+  .estado-menu {
+    top: calc(100% + 6px);
+    left: 0;
+    transform: none;
+    min-width: 140px;
+  }
+}

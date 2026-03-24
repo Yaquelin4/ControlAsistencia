@@ -1,0 +1,22 @@
+# public_html/.htaccess - REACT SPA safe
+Options -MultiViews
+
+RewriteEngine On
+RewriteBase /
+
+# Si el recurso físico (archivo o directorio) existe, servirlo directamente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Si no existe, enviar a index.html (React Router cliente)
+RewriteRule ^ index.html [L]
+
+# Opcional: servir index.html para 404s
+ErrorDocument 404 /index.html
+
+# Protección básica de cabeceras
+<IfModule mod_headers.c>
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+</IfModule>

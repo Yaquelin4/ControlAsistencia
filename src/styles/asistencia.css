@@ -1,0 +1,86 @@
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: #f7f7f7;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Sidebar */
+.sidebar {
+  background: #7a0a0a; /* rojo vino */
+  color: #fff;
+  padding: 24px 16px;
+}
+.sidebar__role {
+  font-weight: 700;
+  letter-spacing: .5px;
+  margin-bottom: 16px;
+}
+.sidebar__nav {
+  display: grid;
+  gap: 10px;
+}
+.navbtn {
+  text-align: left;
+  background: #fff;
+  color: #4c0000;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.navbtn.active { outline: 2px solid #ffd2d2; }
+.navbtn.danger { background: #ffe8e8; color: #7a0a0a; }
+
+/* Main */
+.content { padding: 24px 28px; }
+
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.header h1 { margin: 0; font-size: 26px; color: #1d1d1f; }
+
+.userbox { display: grid; justify-items: end; position: relative; padding-right: 48px; }
+.userbox__name { font-weight: 700; }
+.userbox__role { font-size: 12px; color: #666; }
+.userbox__avatar {
+  position: absolute; right: 0; top: 0;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: url('https://i.pravatar.cc/80') center/cover no-repeat;
+}
+
+/* Toolbar */
+.toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+
+.select {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 6px 10px;
+}
+.select__icon { font-size: 14px; }
+.select select { appearance: none; border: none; outline: none; background: transparent; font-weight: 600; }
+.select__label { opacity: .6; font-size: 12px; }
+
+.btn {
+  background: #a00f0f; color: #fff; border: none; padding: 8px 14px;
+  border-radius: 12px; font-weight: 700; letter-spacing: .3px; cursor: pointer;
+}
+
+/* Card + Table */
+.card { background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.06); overflow: hidden; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table thead th { text-align: left; padding: 12px; background: #fafafa; color: #444; border-bottom: 1px solid #eee; }
+.table tbody td { padding: 12px; border-bottom: 1px solid #f0f0f0; color: #222; }
+
+.usercell { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd center/cover; flex-shrink: 0; }
+
+.ellipsis {
+  max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.actions { text-align: right; width: 40px; }
+.empty { text-align: center; color: #777; padding: 18px; }
+

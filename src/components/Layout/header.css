@@ -1,0 +1,78 @@
+/* src/components/Layout/header.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 25px;
+  background: rgb(236, 236, 236);
+  border-bottom: 1px solid #ddd;
+}
+
+/* Centro del título (ajustable) */
+.header__center { 
+  flex: 1; 
+  text-align: left; 
+}
+
+/* Títulos "REGISTRO Y CONTROL DE ASISTENCIA" */
+.header__title { 
+  margin: 0; 
+  font-size: 20px; 
+  font-weight: 700; 
+  color: #000000; 
+}
+
+/* Nombre del usuario (correo) */
+.header .user-name {
+  font-weight: 600;
+  color: #840101; /* color vino o rojo institucional */
+  font-size: 14px;
+}
+
+/* Texto "Administrador" debajo o al lado */
+.header .user-role {
+  font-size: 12px;
+  color: #444; /* aquí defines el color del texto */
+}
+
+
+.header .userbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.header .userbox__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: url("/public/avatar.jpg") center/cover no-repeat;
+}
+
+/* Agrupamos el nombre y rol en una columna */
+.header .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* texto alineado a la derecha */
+  line-height: 1.1;
+}
+
+.header .user-name {
+  font-weight: 600;
+  color: #840101;
+  font-size: 14px;
+}
+
+.header .user-role {
+  font-size: 12px;
+  color: #444;
+}
+
+
+.header .userbox__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: url("/public/avatar.jpg") center/cover no-repeat;
+}

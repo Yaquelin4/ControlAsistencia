@@ -1,0 +1,182 @@
+/* src/components/Layout/sidebar.css */
+
+/* Layout base */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  align-items: stretch;
+}
+
+/* Sidebar */
+.sidebar {
+  flex: 0 0 220px;         /* ancho fijo */
+  width: 220px;
+  background: #7a0a0a;     /* rojo vino */
+  color: #fff;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  position: relative;
+  z-index: 20;
+}
+
+.sidebar__role {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.sidebar__subrole {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.sidebar__nav {
+  display: grid;
+  gap: 10px;
+}
+
+/* botones del sidebar */
+.navbtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: #fff;
+  color: #4c0000;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s ease, transform 0.2s ease, color 0.3s ease;
+}
+
+.navbtn__icon {
+  font-size: 18px;
+}
+
+/* item activo */
+.navbtn.active {
+  outline: 2px solid #7a0a0a;
+}
+
+/* hover */
+.navbtn:hover {
+  background: #b02a37;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.navbtn:hover .navbtn__icon {
+  color: #fff;
+}
+
+/* botón salir */
+.navbtn.logout {
+  background: #ffffff;
+  color: #4c0000;
+  border: none;
+  font-weight: 600;
+}
+
+.navbtn.logout .navbtn__icon {
+  color: #4c0000;
+}
+
+.navbtn.logout:hover {
+  background: #b02a37;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.navbtn.logout:hover .navbtn__icon {
+  color: #ffffff;
+}
+
+/* Area principal (header + contenido) */
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= RESPONSIVE SIDEBAR ================= */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 210px;
+    flex-basis: 210px;
+    padding: 20px 14px;
+  }
+
+  .navbtn {
+    padding: 9px 10px;
+    font-size: 14px;
+  }
+
+  .navbtn__icon {
+    font-size: 17px;
+  }
+}
+
+/* ================= MÓVIL ================= */
+@media (max-width: 768px) {
+  .app-layout {
+    position: relative;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 240px;
+    flex-basis: 240px;
+    height: 100vh;
+    min-height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: 6px 0 18px rgba(0, 0, 0, 0.25);
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .main {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 900;
+  }
+}
+
+/* ================= EXTRA PEQUEÑO ================= */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 220px;
+    flex-basis: 220px;
+    padding: 18px 12px;
+  }
+
+  .navbtn {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .navbtn__icon {
+    font-size: 16px;
+  }
+}

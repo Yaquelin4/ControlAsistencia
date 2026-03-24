@@ -1,0 +1,279 @@
+/* src/styles/dashboard.css */
+
+.dashboard-page {
+  padding: 20px 28px;
+}
+
+/* Header */
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 18px;
+}
+
+.dash-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.dash-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+.dash-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dash-section-header select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 13px;
+}
+
+
+/* Mensajes */
+.dash-error {
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.dash-empty {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ================= TARJETAS ================= */
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.dash-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.dash-card h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #374151;
+  font-weight: 700;
+}
+
+.dash-card.primary {
+  background: linear-gradient(135deg, #b91c1c, #f97316);
+  color: #fff;
+  border-color: transparent;
+}
+
+.dash-card.primary h3 {
+  color: #fef2f2;
+}
+
+.dash-number {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.dash-card.primary .dash-number {
+  color: #fff;
+}
+
+.dash-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.dash-card.primary .dash-mini {
+  color: #fef2f2;
+}
+
+.dash-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 13px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.04);
+  color: #111827;
+}
+
+.dash-card.primary .dash-chip {
+  background: rgba(15, 23, 42, 0.18);
+  color: #fef2f2;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+/* ================= SECCIONES / GRÁFICOS ================= */
+
+.dash-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-section-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Fila de gráficos (BARRAS + PIE) */
+.dash-charts-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.6fr) minmax(0, 2fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+/* ✅ Gráfico principal (barras) - 15% más pequeño */
+.dash-chart-container {
+  margin-top: 6px;
+  width: 100%;
+  height: 323px;     
+  max-height: none;
+}
+
+/* ✅ Pie - 15% más pequeño */
+.dash-chart-container--small {
+  width: 100%;
+  max-width: 320px;
+  height: 272px;     
+  max-height: none;
+  margin: 8px auto 0;
+}
+
+
+
+/* ================= TABLA (si aún la usas en otras vistas) ================= */
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.dash-table thead th {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.dash-table tbody td {
+  padding: 7px 6px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #4b5563;
+  max-width: 180px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Badge estado (si lo usas) */
+.dash-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.dash-status-pending {
+  color: #eab308;
+  border-color: rgba(234, 179, 8, 0.3);
+  background: rgba(234, 179, 8, 0.06);
+}
+
+.dash-status-ok {
+  color: #16a34a;
+  border-color: rgba(22, 163, 74, 0.3);
+  background: rgba(22, 163, 74, 0.06);
+}
+
+.dash-status-bad {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+  background: rgba(220, 38, 38, 0.06);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1100px) {
+  .dash-charts-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash-chart-container {
+    height: 340px;   
+  }
+
+  .dash-chart-container--small {
+    max-width: 340px;
+    height: 289px;   
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-page {
+    padding: 16px;
+  }
+
+  .dash-chart-container {
+    height: 272px;   
+  }
+
+  .dash-chart-container--small {
+    max-width: 280px;
+    height: 221px;   
+  }
+}
+

@@ -1,0 +1,146 @@
+/* src/styles/table.css */
+:root{
+  --att-primary: #7a0b0b;     /* rojo oscuro cabecera */
+  --att-head-text: #ffffff;
+  --att-row-even: #fafafa;
+  --att-row-odd: #ffffff;
+  --att-row-hover: #f2f2f2;
+  --att-border: #e6e6e6;
+  --att-text: #1f2937;
+  --att-muted: #6b7280;
+  --att-shadow: 0 6px 20px rgba(0,0,0,.08);
+  --att-radius: 14px;
+}
+
+/* Card contenedor */
+.att-card {
+  background: #fff;
+  border-radius: var(--att-radius);
+  box-shadow: var(--att-shadow);
+  overflow: hidden;
+}
+
+/* Toolbar superior (filtros + export) */
+.att-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--att-border);
+  background: #fff;
+  
+}
+/* Btom calendario */
+.select {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 6px 10px;
+}
+.select__icon { font-size: 14px; }
+.select select { appearance: none; border: none; outline: none; background: transparent; font-weight: 600; }
+.select__label { opacity: .6; font-size: 12px; }
+
+.btn {
+  background: #a00f0f; color: #040404; border: none; padding: 8px 14px;
+  border-radius: 12px; font-weight: 700; letter-spacing: .3px; cursor: pointer;
+}
+
+
+
+
+/* Tabla */
+.att-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  color: var(--att-text);
+}
+
+/* Cabecera */
+.att-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, #8a0c0c, var(--att-primary));
+  color: var(--att-head-text);
+  text-align: left;
+  padding: 12px 14px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  border-bottom: 1px solid var(--att-primary);
+  white-space: nowrap;
+}
+
+/* Celdas */
+.att-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--att-border);
+  vertical-align: middle;
+}
+
+/* Zebra */
+.att-table tbody tr:nth-child(odd)  { background: var(--att-row-odd); }
+.att-table tbody tr:nth-child(even) { background: var(--att-row-even); }
+
+/* Hover fila */
+.att-table tbody tr:hover { background: var(--att-row-hover); }
+
+/* Estados */
+.att-table .empty {
+  text-align: center;
+  padding: 16px !important;
+  color: var(--att-muted);
+}
+
+/* Acciones (columna ⋯) */
+.att-table .actions {
+  text-align: right;
+  color: var(--att-muted);
+}
+
+/* Avatar + nombre */
+.att-table .usercell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.att-table .avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ddd;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Ellipsis */
+.att-table .ellipsis {
+  max-width: 360px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Tabla densa opcional */
+.table--dense td,
+.table--dense th { padding-top: 8px; padding-bottom: 8px; }
+
+/* Botones dentro de la toolbar si los usas */
+.att-toolbar .btn {
+  padding: 8px 12px;
+  border: 1px solid var(--att-border);
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.att-toolbar .btn.primary {
+  background: #7a0b0b;
+  color: #fff;
+  border-color: #7a0b0b;
+}
+
+/* Responsive: scroll horizontal suave */
+.att-card > div[style*="overflow-x"] {
+  -webkit-overflow-scrolling: touch;
+}
+

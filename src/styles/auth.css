@@ -1,0 +1,207 @@
+/* src/styles/auth.css */
+
+/* VARIABLES (fáciles de ajustar) */
+:root{
+  --bg-overlay: rgba(0,0,0,0.25);
+  --card-bg: #7a0b0b;        /* rojo oscuro principal */
+  --card-accent: #7f0e0e;
+  --input-bg: #fff;
+  --input-border: rgba(0,0,0,0.08);
+  --btn-primary-bg: #000;   /* botón negro */
+  --btn-google-bg: #fff;
+  --text-light: #fff;
+  --muted: rgba(255,255,255,0.85);
+  --radius-large: 40px;
+}
+
+/* ------------------------------
+   Fondo: usa la imagen desde public/assets
+   ------------------------------ */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 98vh;
+  background: url("./imgLogin.png") no-repeat center center fixed;
+  background-size: cover;
+}
+
+/* overlay oscuro para mejorar contraste del texto */
+.auth-page::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* contenedor de la tarjeta (centra y controla padding) */
+.auth-card-wrapper{
+  position: relative;
+  z-index: 2;               /* encima del overlay */
+  width: 900px;             /* ancho total del layout con imagen a los lados */
+  max-width: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* tarjeta roja central */
+.auth-card {
+  width: 500px;
+  max-width: 92%;
+  background: linear-gradient(180deg, var(--card-bg), var(--card-accent));
+  border-radius: var(--radius-large);
+  padding: 48px 56px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  color: var(--text-light);
+  text-align: center;
+  position: relative;
+}
+
+/* título principal */
+.auth-card h1{
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* subtítulo tipo rol (Administrador) */
+.auth-card .role {
+  margin-top: 8px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* descripción debajo del rol */
+.auth-card .hint {
+  margin-top: 8px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
+}
+
+/* formulario */
+.auth-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+}
+
+/* inputs estilo grande */
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="text"] {
+  width: 100%;
+  max-width: 420px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* placeholder más tenue */
+.auth-form input::placeholder{
+  color: #9b9b9b;
+}
+
+/* botón iniciar sesión negro */
+.auth-btn {
+  width: 100%;
+  max-width: 420px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: var(--btn-primary-bg);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 6px;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.auth-btn:active { transform: translateY(1px); }
+.auth-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* separador "o continuar con" */
+.divider {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  max-width:420px;
+  margin: 16px auto;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+}
+.divider::before,
+.divider::after{
+  content:"";
+  height:1px;
+  background: rgba(255,255,255,0.12);
+  flex:1;
+}
+
+/* boton de Google */
+.google-btn {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  border: none;
+  cursor:pointer;
+  background: var(--btn-google-bg);
+  color: #111;
+  font-weight:600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+.google-btn .g-icon {
+  width:28px; height:28px; border-radius:4px;
+  background: linear-gradient(180deg,#fff,#f1f1f1);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; color:#db4437;
+  border:1px solid rgba(0,0,0,0.06);
+}
+
+/* texto legal */
+.auth-legal {
+  margin-top: 14px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  max-width:420px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* pequeño ajuste responsive */
+@media (max-width: 900px){
+  .auth-card { padding: 32px 28px; width: 92%; border-radius: 28px; }
+  .auth-card h1 { font-size: 26px; }
+}
+@media (max-width: 560px){
+  .auth-card { padding: 20px; border-radius: 18px; }
+  .auth-card h1 { font-size: 22px; }
+  .auth-form input[type="email"],
+  .auth-form input[type="password"] { font-size: 15px; padding:12px; }
+  .google-btn .g-icon { width:24px;height:24px; font-size:13px; }
+}
+
+/* logo superior izquierdo (opcional) */
+.auth-logo {
+  position: absolute;
+  left: 28px;
+  top: 18px;
+  z-index: 3;
+  width: 110px;
+  height: auto;
+}
