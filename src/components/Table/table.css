@@ -1,33 +1,51 @@
-/* src/components/Table/table.css */
 :root {
   --att-primary: #7a0b0b;
+  --att-primary-strong: #5f0808;
   --att-head-text: #ffffff;
   --att-row-even: #fafafa;
   --att-row-odd: #ffffff;
-  --att-row-hover: #f2f2f2;
+  --att-row-hover: #f5f5f5;
   --att-border: #e6e6e6;
   --att-text: #1f2937;
   --att-muted: #6b7280;
-  --att-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  --att-radius: 14px;
+  --att-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --att-radius: 16px;
+  --att-bg-soft: #f9fafb;
 }
 
-/* Card contenedor */
+/* card principal */
 .att-card {
   background: #fff;
   border-radius: var(--att-radius);
   box-shadow: var(--att-shadow);
-  overflow: hidden;
+  overflow: visible;
+  width: 100%;
+  min-width: 0;
 }
 
-/* Toolbar superior (filtros + export) */
+/* toolbar */
 .att-toolbar {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--att-border);
   background: #fff;
+  overflow: visible;
+}
+
+.att-toolbar__left {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: visible;
+}
+
+.att-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
 }
 
 .btn-icon {
@@ -36,53 +54,56 @@
   vertical-align: middle;
 }
 
-/* Botón calendario */
-.select {
-  position: relative;
+/* botones */
+.btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  padding: 6px 10px;
-}
-.select__icon {
-  font-size: 14px;
-}
-.select select {
-  appearance: none;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-weight: 600;
-}
-.select__label {
-  opacity: 0.6;
-  font-size: 12px;
-}
-
-.btn {
-  background: #a00f0f;
-  color: #040404;
-  border: none;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid var(--att-border);
   padding: 8px 14px;
   border-radius: 12px;
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   cursor: pointer;
+  transition: 0.18s ease;
 }
 
-/* Tabla */
+.btn:hover {
+  background: #f9fafb;
+}
+
+.btn.primary {
+  background: var(--att-primary);
+  color: #fff;
+  border-color: var(--att-primary);
+}
+
+.btn.primary:hover {
+  background: var(--att-primary-strong);
+}
+
+/* envoltura tabla */
+.att-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* tabla */
 .att-table {
   width: 100%;
+  min-width: 980px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
   color: var(--att-text);
 }
 
-/* Cabecera */
+/* encabezado */
 .att-table thead th {
   position: sticky;
   top: 0;
@@ -90,62 +111,103 @@
   background: linear-gradient(180deg, #8a0c0c, var(--att-primary));
   color: var(--att-head-text);
   text-align: left;
-  padding: 12px 14px;
-  font-weight: 600;
+  padding: 13px 14px;
+  font-weight: 700;
   letter-spacing: 0.2px;
   border-bottom: 1px solid var(--att-primary);
   white-space: nowrap;
 }
 
-/* Celdas */
+.att-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.att-table thead th:last-child {
+  border-top-right-radius: 12px;
+}
+
+/* celdas */
 .att-table td {
   padding: 12px 14px;
   border-bottom: 1px solid var(--att-border);
   vertical-align: middle;
+  background: transparent;
 }
 
-/* Zebra */
+/* zebra */
 .att-table tbody tr:nth-child(odd) {
   background: var(--att-row-odd);
 }
+
 .att-table tbody tr:nth-child(even) {
   background: var(--att-row-even);
 }
 
-/* Hover fila */
+/* hover */
 .att-table tbody tr:hover {
   background: var(--att-row-hover);
 }
 
-/* Sin registros */
-.att-table .empty {
-  text-align: center;
-  padding: 16px !important;
+/* loading */
+.att-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px;
   color: var(--att-muted);
+  font-weight: 600;
 }
 
-/* Acciones (columna ⋯) */
+.att-loading__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(122, 11, 11, 0.2);
+  border-top-color: var(--att-primary);
+  border-radius: 50%;
+  animation: att-spin 0.8s linear infinite;
+}
+
+@keyframes att-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* vacío */
+.att-table .empty,
+.att-mobile-state.empty {
+  text-align: center;
+  padding: 18px !important;
+  color: var(--att-muted);
+  font-weight: 600;
+}
+
+/* acciones */
 .att-table .actions {
   text-align: right;
   color: var(--att-muted);
+  white-space: nowrap;
 }
 
-/* Avatar + nombre */
+/* avatar + nombre */
 .att-table .usercell {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 170px;
 }
+
 .att-table .avatar {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #ddd;
+  background: #ddd center/cover no-repeat;
   display: inline-block;
   flex-shrink: 0;
 }
 
-/* Ellipsis */
+/* ellipsis */
 .att-table .ellipsis {
   max-width: 360px;
   overflow: hidden;
@@ -153,40 +215,151 @@
   text-overflow: ellipsis;
 }
 
-/* Tabla densa opcional */
+/* dense */
 .table--dense td,
 .table--dense th {
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: 9px;
+  padding-bottom: 9px;
 }
 
-/* Botones dentro de la toolbar */
-.att-toolbar .btn {
-  padding: 8px 12px;
-  border: 1px solid var(--att-border);
-  background: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.att-toolbar .btn.primary {
-  background: #7a0b0b;
-  color: #fff;
-  border-color: #7a0b0b;
-}
-
-/* Footer institucional (última fila) */
+/* footer */
 .att-table tfoot .att-tfoot td {
   text-align: center;
   padding: 14px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--att-muted);
-  background: #f9fafb;
+  background: var(--att-bg-soft);
   border-top: 1px solid var(--att-border);
   border-bottom: 0;
 }
 
-/* Responsive: scroll horizontal suave */
-.att-card > div[style*="overflow-x"] {
-  -webkit-overflow-scrolling: touch;
+/* tarjetas móviles */
+.att-mobile-list {
+  display: none;
+  padding: 14px;
+  background: #fff;
+  overflow: visible;
+}
+
+.att-mobile-card {
+  border: 1px solid var(--att-border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+}
+
+.att-mobile-card + .att-mobile-card {
+  margin-top: 12px;
+}
+
+.att-mobile-card__body {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  overflow: visible;
+}
+
+.att-mobile-item {
+  display: grid;
+  gap: 4px;
+  overflow: visible;
+  position: relative;
+}
+
+.att-mobile-item__label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--att-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.att-mobile-item__value {
+  font-size: 14px;
+  color: var(--att-text);
+  word-break: break-word;
+  overflow: visible;
+  position: relative;
+}
+
+.att-mobile-card__actions {
+  padding: 12px 14px;
+  border-top: 1px solid var(--att-border);
+  background: #fafafa;
+}
+
+.att-mobile-state {
+  padding: 10px 0;
+}
+
+/* tablet */
+@media (max-width: 1024px) {
+  .att-table {
+    min-width: 900px;
+  }
+
+  /* IMPORTANTE: mantener horizontal */
+  .att-toolbar {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .att-toolbar__right {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+}
+
+/* móvil */
+@media (max-width: 768px) {
+  .att-toolbar {
+    padding: 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .att-toolbar__right {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .att-toolbar__right .btn {
+    width: 100%;
+  }
+
+  .att-table-wrap {
+    display: none;
+  }
+
+  .att-mobile-list {
+    display: block;
+  }
+}
+
+/* extra pequeño */
+@media (max-width: 480px) {
+  .att-card {
+    border-radius: 14px;
+  }
+
+  .att-toolbar {
+    gap: 12px;
+  }
+
+  .att-mobile-card__body {
+    padding: 12px;
+  }
+
+  .att-mobile-card__actions {
+    padding: 10px 12px;
+  }
+
+  .btn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
 }

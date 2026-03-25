@@ -1,10 +1,13 @@
 /* src/styles/asistenciaCampo.css */
+
+/* Contenedor */
 .page {
   padding: 15px;
   background: #ffffff;
   font-family: "Segoe UI", sans-serif;
 }
 
+/* Título */
 .page-title {
   font-size: 24px;
   font-weight: 700;
@@ -13,19 +16,88 @@
   text-align: center;
 }
 
-.att-card,
-.att-toolbar,
-.toolbar,
-.select,
-.period-tabs,
-.period-dd {
+/* Mensajes */
+.campo-error {
+  padding: 12px;
+  color: #7a0a0a;
+  background: #fef2f2;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+/* Toolbar principal */
+.att-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  margin-bottom: 12px;
   overflow: visible;
 }
 
-.react-datepicker-popper {
-  z-index: 9999 !important;
+.att-toolbar__left {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
+.att-toolbar__right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* Filtros */
+.period-tabs {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  min-height: 42px;
+  box-sizing: border-box;
+}
+
+.select--date {
+  gap: 12px;
+}
+
+.select__label {
+  font-size: 14px;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.period-tabs .select select,
+.period-tabs .select input,
+.period-tabs .select .react-datepicker-wrapper,
+.period-tabs .select .react-datepicker__input-container,
+.period-tabs .select .react-datepicker__input-container input {
+  width: 100%;
+}
+
+.period-tabs .select select,
+.period-tabs .select .react-datepicker__input-container input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Botones */
 .btn {
   padding: 8px 12px;
   border-radius: 6px;
@@ -34,17 +106,11 @@
   cursor: pointer;
   font-size: 14px;
   color: #111827;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .btn:hover {
   background: #f9fafb;
-}
-
-.btn:focus {
-  outline: none;
-  border-color: #7a0a0a;
-  box-shadow: 0 0 0 3px rgba(122, 10, 10, 0.15);
 }
 
 .btn.primary {
@@ -57,91 +123,17 @@
   background: #6b0909;
 }
 
-.period-tabs {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
+.btn-icon {
+  font-size: 20px;
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
-.period-dd {
-  position: relative;
-  display: inline-flex;
-}
-
-.period-btn {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  color: #111827;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  min-height: 36px;
-}
-
-.period-btn:hover {
-  background: #f9fafb;
-}
-
-.period-btn:focus {
-  outline: none;
-  border-color: #7a0a0a;
-  box-shadow: 0 0 0 3px rgba(122, 10, 10, 0.15);
-}
-
-.period-btn.active {
-  background: #7a0a0a;
-  color: #ffffff;
-  border-color: #7a0a0a;
-}
-
-.period-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  z-index: 70;
-  min-width: 200px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  box-shadow: 0 14px 34px rgba(2, 8, 23, 0.14);
-  padding: 6px;
-  max-height: 320px;
-  overflow: auto;
-}
-
-.period-opt {
-  width: 100%;
-  text-align: left;
-  padding: 9px 10px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: #ffffff;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 14px;
-  color: #111827;
-  transition: background 0.12s ease, transform 0.05s ease;
-  margin: 2px 0;
-}
-
-.period-opt:hover {
-  background: #f9fafb;
-  transform: translateY(-1px);
-}
-
-.period-opt.active {
-  background: #7a0a0a;
-  color: #ffffff;
-  border-color: transparent;
-}
-
+/* Estado */
 .estado-dropdown {
   position: relative;
   display: inline-block;
+  overflow: visible;
 }
 
 .estado-pill {
@@ -152,7 +144,7 @@
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 800;
-  border: 1.6px solid transparent;
+  border: 1px solid transparent;
   background: #ffffff;
   cursor: pointer;
   transition: all 0.18s ease;
@@ -182,17 +174,17 @@
   background: rgba(122, 10, 10, 0.08);
 }
 
-.estado-pill:hover {
-  transform: scale(1.03);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+.estado-pill.withdrawn {
+  color: #475569;
+  border-color: rgba(71, 85, 105, 0.45);
+  background: rgba(71, 85, 105, 0.08);
 }
 
 .estado-menu {
   position: absolute;
-  top: 50%;
+  top: calc(100% + 6px);
   left: 0;
-  transform: translateY(-50%);
-  z-index: 50;
+  z-index: 999;
   min-width: 160px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -219,10 +211,12 @@
   color: #b58100;
   border-color: rgba(181, 129, 0, 0.25);
 }
+
 .estado-option.ok {
   color: #065f46;
   border-color: rgba(6, 95, 70, 0.25);
 }
+
 .estado-option.bad {
   color: #7a0a0a;
   border-color: rgba(122, 10, 10, 0.25);
@@ -239,152 +233,92 @@
   border-color: transparent;
 }
 
-:root {
-  --gpa-primary: #7a0a0a;
-  --gpa-primary-strong: #6b0909;
-  --gpa-accent: #b58100;
-  --gpa-text: #111827;
-  --gpa-muted: #6b7280;
+/* Modal estado móvil */
+.estado-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.38);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
 }
 
-.react-datepicker {
-  border: 1px solid rgba(17, 24, 39, 0.12);
-  border-radius: 12px;
+.estado-modal {
+  width: 100%;
+  max-width: 340px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
   overflow: hidden;
-  font-family: inherit;
 }
 
-.react-datepicker__header {
-  background: #ffffff;
-  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+.estado-modal__header {
+  padding: 16px 18px 10px;
+  border-bottom: 1px solid #ececec;
 }
 
-.react-datepicker__current-month,
-.react-datepicker-time__header,
-.react-datepicker-year-header {
-  color: var(--gpa-text);
+.estado-modal__title {
+  margin: 0;
+  font-size: 16px;
   font-weight: 800;
+  color: #111827;
 }
 
-.react-datepicker__day-name {
-  color: var(--gpa-muted);
-  font-weight: 700;
+.estado-modal__body {
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
 }
 
-.react-datepicker__navigation-icon::before {
-  border-color: var(--gpa-primary);
+.estado-modal__footer {
+  padding: 0 16px 16px;
 }
 
-.react-datepicker__day:hover {
-  background: rgba(122, 10, 10, 0.08);
-  border-radius: 10px;
+.estado-modal__close {
+  width: 100%;
 }
 
-.react-datepicker__day--keyboard-selected {
-  background: rgba(181, 129, 0, 0.14);
-  color: var(--gpa-text);
-  border-radius: 10px;
+/* Datepicker */
+.react-datepicker-popper {
+  z-index: 9999 !important;
 }
 
-.react-datepicker__day--selected,
-.react-datepicker__day--in-selecting-range,
-.react-datepicker__day--in-range {
-  background: var(--gpa-primary);
-  color: #ffffff;
-  border-radius: 10px;
-}
-
-.react-datepicker__day--selected:hover,
-.react-datepicker__day--in-selecting-range:hover,
-.react-datepicker__day--in-range:hover {
-  background: var(--gpa-primary-strong);
-}
-
-.react-datepicker__day--today {
-  border-radius: 10px;
-  box-shadow: inset 0 0 0 2px rgba(122, 10, 10, 0.35);
-}
-
-.react-datepicker__triangle {
-  display: none;
-}
-
-.react-datepicker__day--outside-month {
-  color: rgba(128, 107, 107, 0.55);
-}
-
-.react-datepicker__day--disabled {
-  color: rgba(107, 114, 128, 0.35);
-}
-
-.react-datepicker__month-text:hover,
-.react-datepicker__quarter-text:hover,
-.react-datepicker__year-text:hover {
-  background: rgba(122, 10, 10, 0.08);
-  border-radius: 10px;
-}
-
-.react-datepicker__month-text--selected,
-.react-datepicker__quarter-text--selected,
-.react-datepicker__year-text--selected {
-  background: var(--gpa-primary);
-  color: #ffffff;
-  border-radius: 10px;
-}
-
-.react-datepicker__close-icon::after {
-  background: var(--gpa-primary);
-}
-:root {
-  --gpa-primary: #7a0a0a;
-  --gpa-primary-strong: #6b0909;
-}
-
-/* Día seleccionado (1 fecha) */
-.react-datepicker__day--selected {
-  background: var(--gpa-primary) !important;
-  color: #ffffff !important;
-  border-radius: 10px;
-}
-
-/* Rango (si usas selectsRange) */
-.react-datepicker__day--in-range,
-.react-datepicker__day--in-selecting-range {
-  background: var(--gpa-primary) !important;
-  color: #ffffff !important;
-  border-radius: 10px;
-}
-
-.react-datepicker__day--selected:hover,
-.react-datepicker__day--in-range:hover,
-.react-datepicker__day--in-selecting-range:hover {
-  background: var(--gpa-primary-strong) !important;
-}
-
-
+/* Responsive */
 @media (max-width: 720px) {
-  .period-tabs {
-    width: 100%;
+  .att-toolbar {
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
   }
 
-  .period-dd {
+  .att-toolbar__left {
     width: 100%;
   }
 
-  .period-btn {
+  .att-toolbar__right {
+    margin-left: 0;
     width: 100%;
-    justify-content: space-between;
+    display: flex;
+    justify-content: flex-end;
   }
 
-  .period-menu {
-    min-width: 100%;
+  .period-tabs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .period-tabs .select {
+    width: 100%;
+  }
+
+  .att-toolbar__right .btn {
+    width: 100%;
   }
 
   .estado-menu {
-    top: calc(100% + 6px);
-    left: 0;
-    transform: none;
-    min-width: 140px;
+    display: none;
   }
 }

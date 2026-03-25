@@ -1,4 +1,3 @@
-// src/pages/AsistenciaCampo.jsx
 import { useEffect, useMemo, useState } from "react";
 import AttendanceTable from "../components/Table/AttendanceTable";
 import {
@@ -22,6 +21,9 @@ const STATUS_LABELS_ES = {
   [STATUS.APPROVED]: "Aprobado",
   [STATUS.DENIED]: "Rechazado",
 };
+
+const STATUS_ORDER = [STATUS.PENDING, STATUS.APPROVED, STATUS.DENIED];
+const rowKeyOf = (r) => r.id || `${r.userId}__${r.leaveId}`;
 
 function formatDateForExcel(dateLike) {
   if (!dateLike) return "";
@@ -80,8 +82,9 @@ function exportRangeToExcel(rowsToExport, filename, options) {
   XLSX.writeFile(wb, filename);
 }
 
-const STATUS_ORDER = [STATUS.PENDING, STATUS.APPROVED, STATUS.DENIED];
-const rowKeyOf = (r) => r.id || `${r.userId}__${r.leaveId}`;
+function isMobileViewport() {
+  return window.innerWidth <= 720;
+}
 
 export default function AsistenciaCampo() {
   const { role, managerCode } = useAuth();
@@ -108,11 +111,24 @@ export default function AsistenciaCampo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [openMenuKey, setOpenMenuKey] = useState(null);
+  const [statusModalRow, setStatusModalRow] = useState(null);
 
   useEffect(() => {
     const onDocClick = () => setOpenMenuKey(null);
     document.addEventListener("click", onDocClick);
     return () => document.removeEventListener("click", onDocClick);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      setOpenMenuKey(null);
+      if (!isMobileViewport()) {
+        setStatusModalRow(null);
+      }
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   useEffect(() => {
@@ -130,6 +146,7 @@ export default function AsistenciaCampo() {
         setLoading(false);
       }
     };
+
     load();
   }, [fromDate, toDate]);
 
@@ -146,6 +163,7 @@ export default function AsistenciaCampo() {
     const isWithdrawn = Number(row.withdrawalStatus ?? 0) === 1;
     if (isWithdrawn) {
       setOpenMenuKey(null);
+      setStatusModalRow(null);
       return;
     }
 
@@ -155,7 +173,9 @@ export default function AsistenciaCampo() {
     setRows((prevRows) =>
       prevRows.map((x) => (rowKeyOf(x) === k ? { ...x, estado: newLabel } : x))
     );
+
     setOpenMenuKey(null);
+    setStatusModalRow(null);
 
     try {
       await updateLeaveStatus(row.userId, row.leaveId, newLabel);
@@ -170,6 +190,7 @@ export default function AsistenciaCampo() {
 
   const filteredRows = useMemo(() => {
     if (!rows || rows.length === 0) return [];
+
     let scoped = rows;
 
     if (role === "manager" && managerCode) {
@@ -229,9 +250,9 @@ export default function AsistenciaCampo() {
         header: "Estado",
         render: (r) => {
           const isWithdrawn = Number(r.withdrawalStatus ?? 0) === 1;
-
           const current = r.estado || STATUS.PENDING;
           const k = rowKeyOf(r);
+
           const stop = (ev) => ev.stopPropagation();
 
           const classFor = (label) =>
@@ -256,21 +277,30 @@ export default function AsistenciaCampo() {
             return <span className={classFor(current)}>{currentLabelEs}</span>;
           }
 
+          const handleOpen = () => {
+            if (isMobileViewport()) {
+              setStatusModalRow(r);
+            } else {
+              setOpenMenuKey(openMenuKey === k ? null : k);
+            }
+          };
+
           return (
             <div className="estado-dropdown" onClick={stop}>
               <button
                 type="button"
                 className={classFor(current)}
-                onClick={() => setOpenMenuKey(openMenuKey === k ? null : k)}
+                onClick={handleOpen}
               >
                 {currentLabelEs}
                 <span className="chev">▾</span>
               </button>
 
-              {openMenuKey === k && (
+              {!isMobileViewport() && openMenuKey === k && (
                 <div className="estado-menu" onClick={stop}>
                   {STATUS_ORDER.map((label) => {
                     const labelEs = STATUS_LABELS_ES[label] || label;
+
                     return (
                       <button
                         key={label}
@@ -305,7 +335,6 @@ export default function AsistenciaCampo() {
   const ToolbarFilters = (
     <div className="period-tabs" onClick={(e) => e.stopPropagation()}>
       <div className="select select--date">
-        <span className="select__icon"></span>
         <DatePicker
           locale="es"
           selected={fromDate}
@@ -316,7 +345,6 @@ export default function AsistenciaCampo() {
       </div>
 
       <div className="select select--date">
-        <span className="select__icon"></span>
         <DatePicker
           locale="es"
           selected={toDate}
@@ -328,7 +356,10 @@ export default function AsistenciaCampo() {
       </div>
 
       <div className="select">
-        <select value={estadoFilter} onChange={(e) => setEstadoFilter(e.target.value)}>
+        <select
+          value={estadoFilter}
+          onChange={(e) => setEstadoFilter(e.target.value)}
+        >
           <option value="all">Todos</option>
           <option value={STATUS.PENDING}>Pendiente</option>
           <option value={STATUS.APPROVED}>Aprobado</option>
@@ -338,7 +369,10 @@ export default function AsistenciaCampo() {
       </div>
 
       <div className="select">
-        <select value={tipoFilter} onChange={(e) => setTipoFilter(e.target.value)}>
+        <select
+          value={tipoFilter}
+          onChange={(e) => setTipoFilter(e.target.value)}
+        >
           <option value="all">Todos</option>
           {tipoOptions
             .filter((x) => x !== "all")
@@ -357,16 +391,18 @@ export default function AsistenciaCampo() {
     const dd = (d) => String(d.getDate()).padStart(2, "0");
     const mm = (d) => String(d.getMonth() + 1).padStart(2, "0");
     const yy = (d) => d.getFullYear();
-    const a = fromDate ? `${dd(fromDate)}-${mm(fromDate)}-${yy(fromDate)}` : "inicio";
+    const a = fromDate
+      ? `${dd(fromDate)}-${mm(fromDate)}-${yy(fromDate)}`
+      : "inicio";
     const b = toDate ? `${dd(toDate)}-${mm(toDate)}-${yy(toDate)}` : "fin";
     return `asistencia_campo_${a}_a_${b}.xlsx`;
   }, [fromDate, toDate]);
 
   return (
     <div className="page">
-      <h1 className="page-title">Control de Asistencia – Campo</h1>
+      <h1 className="page-title">Plataforma de Gestión: Salidas del Personal a Campo y actividades externas </h1>
 
-      {error && <div style={{ padding: 12, color: "#7a0a0a" }}>{error}</div>}
+      {error && <div className="campo-error">{error}</div>}
 
       <AttendanceTable
         columns={columns}
@@ -381,6 +417,55 @@ export default function AsistenciaCampo() {
         }
         getRowKey={(r, i) => r.id ?? `${r.usuario}-${i}`}
       />
+
+      {statusModalRow && (
+        <div
+          className="estado-modal-backdrop"
+          onClick={() => setStatusModalRow(null)}
+        >
+          <div className="estado-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="estado-modal__header">
+              <h3 className="estado-modal__title">Cambiar estado</h3>
+            </div>
+
+            <div className="estado-modal__body">
+              {STATUS_ORDER.map((label) => {
+                const labelEs = STATUS_LABELS_ES[label] || label;
+                const current = statusModalRow.estado || STATUS.PENDING;
+
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    className={
+                      "estado-option " +
+                      (label === STATUS.PENDING
+                        ? "pending"
+                        : label === STATUS.APPROVED
+                        ? "ok"
+                        : "bad") +
+                      (label === current ? " active" : "")
+                    }
+                    onClick={() => changeEstado(statusModalRow, label)}
+                  >
+                    {labelEs}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="estado-modal__footer">
+              <button
+                type="button"
+                className="btn estado-modal__close"
+                onClick={() => setStatusModalRow(null)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

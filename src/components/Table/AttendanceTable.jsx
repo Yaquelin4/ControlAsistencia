@@ -3,7 +3,6 @@ import React from "react";
 import "../Table/table.css";
 import { TbFileTypeXls } from "react-icons/tb";
 
-// =================== Componente de tabla reutilizable ===================
 export default function AttendanceTable({
   columns = [],
   rows = [],
@@ -15,40 +14,39 @@ export default function AttendanceTable({
   toolbarRight,
   getRowKey,
   dense = false,
-
-  // NUEVO (opcional): footer institucional
   footerText = "guamanpoma.org",
+  mobileCardView = true,
 }) {
-  // --- Generador de clave única por fila ---
   const keyGetter = getRowKey || ((row, i) => row.id ?? i);
-
   const colSpan = columns.length + (actions ? 1 : 0);
 
-  // --- Render principal ---
+  const renderCellValue = (row, column) => {
+    if (column.render) return column.render(row);
+    return row[column.key];
+  };
+
   return (
-    <div className="att-card card">
-      {/* Barra superior (filtros, botones, exportar) */}
+    <div className="att-card">
       {(toolbarLeft || toolbarRight || onExport) && (
-        <div className="att-toolbar toolbar" style={{ gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {toolbarLeft}
-          </div>
-          <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+        <div className="att-toolbar">
+          <div className="att-toolbar__left">{toolbarLeft}</div>
+
+          <div className="att-toolbar__right">
             {toolbarRight}
+
             {onExport && (
-              <button className="btn primary" onClick={onExport}>
+              <button type="button" className="btn primary" onClick={onExport}>
                 <TbFileTypeXls className="btn-icon" />
-                Generar reporte
+                <span>Generar reporte</span>
               </button>
             )}
           </div>
         </div>
       )}
 
-      {/* Contenedor de la tabla */}
-      <div style={{ overflowX: "auto" }}>
-        <table className={`att-table table ${dense ? "table--dense" : ""}`}>
-          {/* Encabezado de columnas */}
+      {/* Vista desktop / tablet */}
+      <div className="att-table-wrap">
+        <table className={`att-table ${dense ? "table--dense" : ""}`}>
           <thead>
             <tr>
               {columns.map((c) => (
@@ -57,28 +55,27 @@ export default function AttendanceTable({
                   style={{
                     width: c.width,
                     textAlign: c.align || "left",
-                    whiteSpace: "nowrap",
                   }}
                 >
                   {c.header}
                 </th>
               ))}
-              {actions && <th style={{ width: 40 }} />}
+              {actions && <th style={{ width: 60, textAlign: "right" }}>Acciones</th>}
             </tr>
           </thead>
 
-          {/* Cuerpo de la tabla */}
           <tbody>
-            {/* Estado de carga */}
             {loading && (
               <tr>
-                <td colSpan={colSpan} style={{ textAlign: "center" }}>
-                  Cargando...
+                <td colSpan={colSpan}>
+                  <div className="att-loading">
+                    <div className="att-loading__spinner" />
+                    <span>Cargando registros...</span>
+                  </div>
                 </td>
               </tr>
             )}
 
-            {/* Sin registros */}
             {!loading && rows.length === 0 && (
               <tr>
                 <td colSpan={colSpan} className="empty">
@@ -87,7 +84,6 @@ export default function AttendanceTable({
               </tr>
             )}
 
-            {/* Filas con datos */}
             {!loading &&
               rows.map((row, idx) => (
                 <tr key={keyGetter(row, idx)}>
@@ -96,24 +92,68 @@ export default function AttendanceTable({
                       key={c.key}
                       style={{ textAlign: c.align || "left" }}
                       className={c.ellipsis ? "ellipsis" : undefined}
-                      title={c.ellipsis ? (row[c.key] ?? "") : undefined}
+                      title={
+                        c.ellipsis && typeof row[c.key] !== "object"
+                          ? String(row[c.key] ?? "")
+                          : undefined
+                      }
                     >
-                      {c.render ? c.render(row) : row[c.key]}
+                      {renderCellValue(row, c)}
                     </td>
                   ))}
+
                   {actions && <td className="actions">{actions(row)}</td>}
                 </tr>
               ))}
           </tbody>
 
-          {/* Footer institucional (última fila) */}
-          <tfoot>
-            <tr className="att-tfoot">
-              <td colSpan={colSpan}>{footerText}</td>
-            </tr>
-          </tfoot>
+          {footerText && (
+            <tfoot>
+              <tr className="att-tfoot">
+                <td colSpan={colSpan}>{footerText}</td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
+
+      {/* Vista móvil tipo tarjetas */}
+      {mobileCardView && (
+        <div className="att-mobile-list">
+          {loading && (
+            <div className="att-mobile-state">
+              <div className="att-loading">
+                <div className="att-loading__spinner" />
+                <span>Cargando registros...</span>
+              </div>
+            </div>
+          )}
+
+          {!loading && rows.length === 0 && (
+            <div className="att-mobile-state empty">{emptyText}</div>
+          )}
+
+          {!loading &&
+            rows.map((row, idx) => (
+              <div className="att-mobile-card" key={keyGetter(row, idx)}>
+                <div className="att-mobile-card__body">
+                  {columns.map((c) => (
+                    <div className="att-mobile-item" key={c.key}>
+                      <div className="att-mobile-item__label">{c.header}</div>
+                      <div className="att-mobile-item__value">
+                        {renderCellValue(row, c)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {actions && (
+                  <div className="att-mobile-card__actions">{actions(row)}</div>
+                )}
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }

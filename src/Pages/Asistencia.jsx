@@ -1,267 +1,463 @@
 // src/pages/Asistencia.jsx
 import { useEffect, useMemo, useState } from "react";
+import AttendanceTable from "../components/Table/AttendanceTable";
+import {
+  fetchAsistenciaByRange,
+  fmtFechaCorta,
+  updateLeaveStatus,
+  STATUS,
+} from "../services/asistenciaCampoService";
 import * as XLSX from "xlsx";
-import { fetchAsistenciaByMonth, fmtFechaCorta } from "../services/asistenciaService";
-import "../styles/asistencia.css";
+import "../styles/asistenciaCampo.css";
+import { useAuth } from "../contexts/loginContext";
 
-const MESES = [
-  { v: 0,  t: "Todos" },
-  { v: 1,  t: "Enero" }, { v: 2,  t: "Febrero" }, { v: 3,  t: "Marzo" },
-  { v: 4,  t: "Abril" }, { v: 5,  t: "Mayo" }, { v: 6,  t: "Junio" },
-  { v: 7,  t: "Julio" }, { v: 8,  t: "Agosto" }, { v: 9,  t: "Septiembre" },
-  { v: 10, t: "Octubre" }, { v: 11, t: "Noviembre" }, { v: 12, t: "Diciembre" },
-];
+import DatePicker, { registerLocale } from "react-datepicker";
+import es from "date-fns/locale/es";
+import "react-datepicker/dist/react-datepicker.css";
 
-// ----------------- Helpers para Excel -----------------
+registerLocale("es", es);
+
+const STATUS_LABELS_ES = {
+  [STATUS.PENDING]: "Pendiente",
+  [STATUS.APPROVED]: "Aprobado",
+  [STATUS.DENIED]: "Rechazado",
+};
+
 function formatDateForExcel(dateLike) {
   if (!dateLike) return "";
   const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
-  const day = d.getDate().toString().padStart(2, "0");
-  const month = (d.getMonth() + 1).toString().padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}-${month}-${year}`;
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
 }
 
-function buildSheetData(rowsArray) {
-  return rowsArray.map((r) => ({
-    Usuario: r.usuario || "",
-    Salida: r.salida || "",
-    Responsable: r.responsable || "",
-    Mes: r.mes ? (MESES.find((m) => m.v === Number(r.mes))?.t ?? r.mes) : "",
-    Desde: formatDateForExcel(r.desde),
-    Hasta: formatDateForExcel(r.hasta),
-    "Tipo permiso": r.tipoPermiso || "",
-    Justificación: r.justificacion || "",
-  }));
+function parseDDMMYYYYToDate(s) {
+  if (!s) return null;
+  const str = String(s).trim();
+  const m = /^(\d{2})-(\d{2})-(\d{4})$/.exec(str);
+  if (!m) return null;
+  const dd = Number(m[1]);
+  const mm = Number(m[2]);
+  const yyyy = Number(m[3]);
+  const d = new Date(yyyy, mm - 1, dd);
+  return Number.isFinite(d.getTime()) ? d : null;
 }
 
-/** Exporta solo el mes seleccionado (rowsToExport debe contener solo ese mes) */
-function exportMonthToExcel(selectedMonth, rowsToExport) {
-  const sheetName = selectedMonth ? `${MESES.find(m => m.v === Number(selectedMonth))?.t ?? `Mes-${selectedMonth}`}` : "Mes";
-  const worksheetData = buildSheetData(rowsToExport);
-  const ws = XLSX.utils.json_to_sheet(worksheetData, {
-    header: [
-      "Usuario",
-      "Salida",
-      "Responsable",
-      "Mes",
-      "Desde",
-      "Hasta",
-      "Tipo permiso",
-      "Justificación",
-    ],
+function parseDDMMYYYYToTS(s) {
+  const d = parseDDMMYYYYToDate(s);
+  return d ? d.getTime() : 0;
+}
+
+function buildSheetData(rowsArray, { includeResponsable }) {
+  return (rowsArray || []).map((r) => {
+    const isWithdrawn = Number(r.withdrawalStatus ?? 0) === 1;
+
+    const base = {
+      Usuario: r.usuario || "",
+      Responsable: r.responsable || "",
+      Solicitado: r.appliedDate ? String(r.appliedDate) : "",
+      Desde: formatDateForExcel(r.desde),
+      Hasta: formatDateForExcel(r.hasta),
+      "Tipo permiso": r.tipoPermiso || "",
+      Justificación: r.justificacion || "",
+      Estado: isWithdrawn
+        ? "Retirado"
+        : STATUS_LABELS_ES[r.estado || STATUS.PENDING] || "Pendiente",
+    };
+
+    if (includeResponsable) return base;
+
+    const { Responsable, ...rest } = base;
+    return rest;
   });
-  ws["!cols"] = [
-    { wch: 25 }, { wch: 12 }, { wch: 22 }, { wch: 8 },
-    { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 40 }
-  ];
+}
+
+function exportRangeToExcel(rowsToExport, filename, options) {
+  const ws = XLSX.utils.json_to_sheet(buildSheetData(rowsToExport, options));
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, String(sheetName).substring(0, 31));
-  const filename = `asistencia_${sheetName}.xlsx`;
+  XLSX.utils.book_append_sheet(wb, ws, "Asistencia".substring(0, 31));
   XLSX.writeFile(wb, filename);
 }
 
-/** Exporta todas las filas en hojas separadas por mes */
-function exportAllMonthsToExcel(allRows) {
-  if (!allRows || allRows.length === 0) return;
-  const groups = {};
-  allRows.forEach((r) => {
-    const m = r.mes ? String(r.mes) : "SinMes";
-    if (!groups[m]) groups[m] = [];
-    groups[m].push(r);
+const STATUS_ORDER = [STATUS.PENDING, STATUS.APPROVED, STATUS.DENIED];
+const rowKeyOf = (r) => r.id || `${r.userId}__${r.leaveId}`;
+
+export default function AsistenciaCampo() {
+  const { role, managerCode } = useAuth();
+  const isManager = role === "manager";
+  const canEditStatus = role === "admin" || role === "manager";
+
+  const [fromDate, setFromDate] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    d.setHours(0, 0, 0, 0);
+    return d;
   });
 
-  const wb = XLSX.utils.book_new();
-
-  Object.keys(groups).sort((a, b) => {
-    if (a === "SinMes") return 1;
-    if (b === "SinMes") return -1;
-    return Number(a) - Number(b);
-  }).forEach((mKey) => {
-    const rowsArr = groups[mKey];
-    const sheetName = mKey === "SinMes"
-      ? "SinMes"
-      : (MESES[Number(mKey)]?.t || `Mes-${mKey}`);
-    const worksheetData = buildSheetData(rowsArr);
-    const ws = XLSX.utils.json_to_sheet(worksheetData, {
-      header: [
-        "Usuario",
-        "Salida",
-        "Responsable",
-        "Mes",
-        "Desde",
-        "Hasta",
-        "Tipo permiso",
-        "Justificación",
-      ],
-    });
-    ws["!cols"] = [
-      { wch: 25 }, { wch: 12 }, { wch: 22 }, { wch: 8 },
-      { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 40 }
-    ];
-    XLSX.utils.book_append_sheet(wb, ws, String(sheetName).substring(0, 31));
+  const [toDate, setToDate] = useState(() => {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d;
   });
 
-  XLSX.writeFile(wb, `asistencia_todos_meses.xlsx`);
-}
+  const [estadoFilter, setEstadoFilter] = useState("all");
+  const [tipoFilter, setTipoFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
-// ----------------- Componente -----------------
-export default function Asistencia() {
-  const currentMonth = new Date().getMonth() + 1;
-  const [month, setMonth] = useState(currentMonth); // 0 = Todos, 1..12
+  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [rowsAll, setRowsAll] = useState([]); // todos los registros
-  const [rows, setRows] = useState([]);       // registros filtrados para la vista
   const [error, setError] = useState("");
+  const [openMenuKey, setOpenMenuKey] = useState(null);
 
-  const mesLabel = useMemo(
-    () => MESES.find((x) => x.v === Number(month))?.t ?? "Mes",
-    [month]
-  );
-
-  // Carga todos los datos UNA vez al montar
   useEffect(() => {
-    let mounted = true;
-    const loadAll = async () => {
+    const onDocClick = () => setOpenMenuKey(null);
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, []);
+
+  useEffect(() => {
+    const load = async () => {
       setLoading(true);
       setError("");
       try {
-        const data = await fetchAsistenciaByMonth(null); // trae todo
-        if (!mounted) return;
-        setRowsAll(data);
-        // filtra para la vista inicial (mes actual)
-        if (Number(month) === 0) setRows(data);
-        else setRows(data.filter((r) => Number(r.mes) === Number(month)));
+        const data = await fetchAsistenciaByRange(fromDate, toDate);
+        setRows(data || []);
       } catch (e) {
         console.error(e);
-        if (!mounted) return;
         setError("No se pudieron cargar los datos.");
-        setRowsAll([]);
         setRows([]);
       } finally {
-        if (mounted) setLoading(false);
+        setLoading(false);
       }
     };
-    loadAll();
-    return () => { mounted = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    load();
+  }, [fromDate, toDate]);
 
-  // Cuando cambie el month, filtramos localmente (sin llamar al servidor)
-  useEffect(() => {
-    if (!rowsAll) return;
-    if (Number(month) === 0) setRows(rowsAll);
-    else setRows(rowsAll.filter((r) => Number(r.mes) === Number(month)));
-  }, [month, rowsAll]);
+  const tipoOptions = useMemo(() => {
+    const set = new Set();
+    (rows || []).forEach((r) => {
+      const t = (r?.tipoPermiso ?? "").toString().trim();
+      if (t) set.add(t);
+    });
+    return ["all", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [rows]);
 
-  // botón: genera según la selección actual
-  const handleGenerar = () => {
-    if (Number(month) === 0) {
-      // Todos los meses
-      exportAllMonthsToExcel(rowsAll);
-    } else {
-      // Solo el mes seleccionado (rows ya está filtrado)
-      exportMonthToExcel(month, rows);
+  const changeEstado = async (row, newLabel) => {
+    const isWithdrawn = Number(row.withdrawalStatus ?? 0) === 1;
+    if (isWithdrawn) {
+      setOpenMenuKey(null);
+      return;
+    }
+
+    const k = rowKeyOf(row);
+    const prev = row.estado;
+
+    setRows((prevRows) =>
+      prevRows.map((x) => (rowKeyOf(x) === k ? { ...x, estado: newLabel } : x))
+    );
+    setOpenMenuKey(null);
+
+    try {
+      await updateLeaveStatus(row.userId, row.leaveId, newLabel);
+    } catch (err) {
+      console.error("updateLeaveStatus error:", err);
+      setRows((prevRows) =>
+        prevRows.map((x) => (rowKeyOf(x) === k ? { ...x, estado: prev } : x))
+      );
+      alert("No se pudo actualizar el estado en Firebase.");
     }
   };
 
-  return (
-    <div className="layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar__role">ADMINISTRADOR</div>
-        <nav className="sidebar__nav">
-          <button className="navbtn active">Inicio</button>
-          <button className="navbtn">Asistencia Local</button>
-          <button className="navbtn">Agregar Usuario</button>
-          <button className="navbtn danger">Salir</button>
-        </nav>
-      </aside>
+  const filteredRows = useMemo(() => {
+    if (!rows || rows.length === 0) return [];
+    let scoped = rows;
 
-      {/* Main */}
-      <main className="content">
-        <header className="header">
-          <h1>ASISTENCIA DE CAMPO</h1>
-          <div className="userbox">
-            <div className="userbox__name">Oscar</div>
-            <div className="userbox__role">Administrador</div>
-            <div className="userbox__avatar" />
-          </div>
-        </header>
+    if (role === "manager" && managerCode) {
+      scoped = scoped.filter((r) => {
+        const rowManager = r.managerCode || r.manager || null;
+        return rowManager === managerCode;
+      });
+    }
 
-        {/* Toolbar: selector de mes + botón generar (según selección) */}
-        <div className="toolbar">
-          <div className="select">
-            <span className="select__icon" role="img" aria-label="calendar">📅</span>
-            <select
-              value={month}
-              onChange={(e) => setMonth(Number(e.target.value))}
-            >
-              {MESES.map((m) => (
-                <option key={m.v} value={m.v}>{m.t}</option>
-              ))}
-            </select>
-            <span className="select__label">{mesLabel}</span>
-          </div>
+    if (estadoFilter !== "all") {
+      scoped = scoped.filter((r) => {
+        const isWithdrawn = Number(r.withdrawalStatus ?? 0) === 1;
+        if (isWithdrawn) return false;
+        return (r.estado || STATUS.PENDING) === estadoFilter;
+      });
+    }
 
-          <button
-            className="btn"
-            onClick={handleGenerar}
-            disabled={loading || rowsAll.length === 0}
-            style={{ marginLeft: 8, background: "#a00f0f", color: "#fff" }}
-          >
-            {loading ? "Cargando..." : (Number(month) === 0 ? "Generar reporte (todos los meses)" : `Generar reporte (${MESES.find(m=>m.v===Number(month))?.t})`)}
-          </button>
-        </div>
+    if (tipoFilter !== "all") {
+      scoped = scoped.filter((r) => {
+        const t = (r?.tipoPermiso ?? "").toString().trim();
+        return t === tipoFilter;
+      });
+    }
 
-        {/* Card + Table */}
-        <div className="card">
-          {error && <div style={{ padding: 12, color: "#a00f0f" }}>{error}</div>}
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Salida</th>
-                <th>Responsable</th>
-                <th>Mes</th>
-                <th>Desde</th>
-                <th>Hasta</th>
-                <th>Tipo permiso</th>
-                <th>Justificación</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {!loading && rows.length === 0 && (
-                <tr>
-                  <td colSpan="9" className="empty">Sin registros</td>
-                </tr>
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      scoped = scoped.filter((r) => {
+        const usuario = (r.usuario || "").toLowerCase();
+        const responsable = (r.responsable || "").toLowerCase();
+        const tipo = (r.tipoPermiso || "").toLowerCase();
+        const justificacion = (r.justificacion || "").toLowerCase();
+        const solicitado = (r.appliedDate || "").toLowerCase();
+
+        return (
+          usuario.includes(q) ||
+          responsable.includes(q) ||
+          tipo.includes(q) ||
+          justificacion.includes(q) ||
+          solicitado.includes(q)
+        );
+      });
+    }
+
+    const sorted = [...scoped].sort((a, b) => {
+      const ta = parseDDMMYYYYToTS(a.appliedDate);
+      const tb = parseDDMMYYYYToTS(b.appliedDate);
+
+      if (ta === 0 && tb === 0) return 0;
+      if (ta === 0) return 1;
+      if (tb === 0) return -1;
+      if (tb !== ta) return tb - ta;
+
+      const ida = String(rowKeyOf(a));
+      const idb = String(rowKeyOf(b));
+      return idb.localeCompare(ida);
+    });
+
+    return sorted;
+  }, [rows, role, managerCode, estadoFilter, tipoFilter, search]);
+
+  const summary = useMemo(() => {
+    const total = filteredRows.length;
+    const pending = filteredRows.filter(
+      (r) => Number(r.withdrawalStatus ?? 0) !== 1 && (r.estado || STATUS.PENDING) === STATUS.PENDING
+    ).length;
+    const approved = filteredRows.filter(
+      (r) => Number(r.withdrawalStatus ?? 0) !== 1 && (r.estado || STATUS.PENDING) === STATUS.APPROVED
+    ).length;
+    const denied = filteredRows.filter(
+      (r) => Number(r.withdrawalStatus ?? 0) !== 1 && (r.estado || STATUS.PENDING) === STATUS.DENIED
+    ).length;
+    const withdrawn = filteredRows.filter(
+      (r) => Number(r.withdrawalStatus ?? 0) === 1
+    ).length;
+
+    return { total, pending, approved, denied, withdrawn };
+  }, [filteredRows]);
+
+  const columns = useMemo(() => {
+    const base = [
+      { key: "usuario", header: "Usuario" },
+      { key: "responsable", header: "Responsable" },
+      {
+        key: "appliedDate",
+        header: "Solicitado",
+        render: (r) => (r.appliedDate ? String(r.appliedDate) : ""),
+      },
+      { key: "desde", header: "Desde", render: (r) => fmtFechaCorta(r.desde) },
+      { key: "hasta", header: "Hasta", render: (r) => fmtFechaCorta(r.hasta) },
+      { key: "tipoPermiso", header: "Tipo" },
+      { key: "justificacion", header: "Justificación", ellipsis: true },
+      {
+        key: "estado",
+        header: "Estado",
+        render: (r) => {
+          const isWithdrawn = Number(r.withdrawalStatus ?? 0) === 1;
+          const current = r.estado || STATUS.PENDING;
+          const k = rowKeyOf(r);
+          const stop = (ev) => ev.stopPropagation();
+
+          const classFor = (label) =>
+            "estado-pill " +
+            (label === STATUS.PENDING
+              ? "pending"
+              : label === STATUS.APPROVED
+              ? "ok"
+              : "bad");
+
+          const currentLabelEs = STATUS_LABELS_ES[current] || current;
+
+          if (isWithdrawn) {
+            return (
+              <div className="estado-dropdown" onClick={stop}>
+                <div className="estado-pill withdrawn">Retirado</div>
+              </div>
+            );
+          }
+
+          if (!canEditStatus) {
+            return <span className={classFor(current)}>{currentLabelEs}</span>;
+          }
+
+          return (
+            <div className="estado-dropdown" onClick={stop}>
+              <button
+                type="button"
+                className={classFor(current)}
+                onClick={() => setOpenMenuKey(openMenuKey === k ? null : k)}
+              >
+                {currentLabelEs}
+                <span className="chev">▾</span>
+              </button>
+
+              {openMenuKey === k && (
+                <div className="estado-menu" onClick={stop}>
+                  {STATUS_ORDER.map((label) => {
+                    const labelEs = STATUS_LABELS_ES[label] || label;
+                    return (
+                      <button
+                        key={label}
+                        type="button"
+                        className={
+                          "estado-option " +
+                          (label === STATUS.PENDING
+                            ? "pending"
+                            : label === STATUS.APPROVED
+                            ? "ok"
+                            : "bad") +
+                          (label === current ? " active" : "")
+                        }
+                        onClick={() => changeEstado(r, label)}
+                      >
+                        {labelEs}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-              {rows.map((r) => (
-                <tr key={r.id}>
-                  <td className="usercell">
-                    <span
-                      className="avatar"
-                      style={{
-                        backgroundImage: r.avatarUrl ? `url(${r.avatarUrl})` : undefined,
-                      }}
-                    />
-                    {r.usuario}
-                  </td>
-                  <td>{r.salida}</td>
-                  <td>{r.responsable}</td>
-                  <td>{r.mes ? (MESES.find((m) => m.v === Number(r.mes))?.t ?? r.mes) : ""}</td>
-                  <td>{fmtFechaCorta(r.desde)}</td>
-                  <td>{fmtFechaCorta(r.hasta)}</td>
-                  <td>{r.tipoPermiso}</td>
-                  <td className="ellipsis" title={r.justificacion}>{r.justificacion}</td>
-                  <td className="actions">⋯</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            </div>
+          );
+        },
+      },
+    ];
+
+    if (isManager) return base.filter((c) => c.key !== "responsable");
+    return base;
+  }, [isManager, openMenuKey, canEditStatus]);
+
+  const resetFilters = () => {
+    setEstadoFilter("all");
+    setTipoFilter("all");
+    setSearch("");
+  };
+
+  const ToolbarFilters = (
+    <div className="campo-toolbar" onClick={(e) => e.stopPropagation()}>
+      <div className="campo-toolbar__filters">
+        <div className="select select--date">
+          <DatePicker
+            locale="es"
+            selected={fromDate}
+            onChange={(d) => d && setFromDate(d)}
+            dateFormat="dd-MM-yyyy"
+          />
+          <span className="select__label">Desde</span>
         </div>
-      </main>
+
+        <div className="select select--date">
+          <DatePicker
+            locale="es"
+            selected={toDate}
+            onChange={(d) => d && setToDate(d)}
+            dateFormat="dd-MM-yyyy"
+            minDate={fromDate}
+          />
+          <span className="select__label">Hasta</span>
+        </div>
+
+        <div className="select">
+          <select value={estadoFilter} onChange={(e) => setEstadoFilter(e.target.value)}>
+            <option value="all">Todos</option>
+            <option value={STATUS.PENDING}>Pendiente</option>
+            <option value={STATUS.APPROVED}>Aprobado</option>
+            <option value={STATUS.DENIED}>Rechazado</option>
+          </select>
+          <span className="select__label">Estado</span>
+        </div>
+
+        <div className="select">
+          <select value={tipoFilter} onChange={(e) => setTipoFilter(e.target.value)}>
+            <option value="all">Todos</option>
+            {tipoOptions
+              .filter((x) => x !== "all")
+              .map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+          </select>
+          <span className="select__label">Tipo permiso</span>
+        </div>
+
+        <div className="campo-search">
+          <input
+            type="text"
+            placeholder="Buscar usuario, responsable, tipo o justificación"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <button type="button" className="btn" onClick={resetFilters}>
+          Limpiar filtros
+        </button>
+      </div>
+
+      <div className="campo-summary">
+        <div className="summary-card">
+          <span className="summary-card__label">Total</span>
+          <strong>{summary.total}</strong>
+        </div>
+        <div className="summary-card pending">
+          <span className="summary-card__label">Pendiente</span>
+          <strong>{summary.pending}</strong>
+        </div>
+        <div className="summary-card ok">
+          <span className="summary-card__label">Aprobado</span>
+          <strong>{summary.approved}</strong>
+        </div>
+        <div className="summary-card bad">
+          <span className="summary-card__label">Rechazado</span>
+          <strong>{summary.denied}</strong>
+        </div>
+        <div className="summary-card withdrawn">
+          <span className="summary-card__label">Retirado</span>
+          <strong>{summary.withdrawn}</strong>
+        </div>
+      </div>
     </div>
+  );
+
+  const exportName = useMemo(() => {
+    const dd = (d) => String(d.getDate()).padStart(2, "0");
+    const mm = (d) => String(d.getMonth() + 1).padStart(2, "0");
+    const yy = (d) => d.getFullYear();
+    const a = fromDate ? `${dd(fromDate)}-${mm(fromDate)}-${yy(fromDate)}` : "inicio";
+    const b = toDate ? `${dd(toDate)}-${mm(toDate)}-${yy(toDate)}` : "fin";
+    return `asistencia_campo_${a}_a_${b}.xlsx`;
+  }, [fromDate, toDate]);
+
+  return (
+    <section className="campo-page">
+      {error && <div className="campo-error">{error}</div>}
+
+      <AttendanceTable
+        columns={columns}
+        rows={filteredRows}
+        loading={loading}
+        emptyText="Sin registros"
+        toolbarLeft={ToolbarFilters}
+        onExport={() =>
+          exportRangeToExcel(filteredRows, exportName, {
+            includeResponsable: !isManager,
+          })
+        }
+        getRowKey={(r, i) => r.id ?? `${r.usuario}-${i}`}
+      />
+    </section>
   );
 }

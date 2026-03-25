@@ -16,10 +16,8 @@ export default function App() {
   return (
     <SessionGuard>
       <Routes>
-        {/* Login público */}
         <Route path="/login" element={<Login />} />
 
-        {/* Zona protegida que usa el Layout */}
         <Route
           path="/"
           element={
@@ -28,43 +26,29 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          {/* Dashboard principal (ruta raíz) */}
-          <Route index element={<Dashboard />} />
-
-          {/* Alias /dashboard */}
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-
-          {/* Asistencia campo: admin y managers */}
           <Route path="asistencia-campo" element={<AsistenciaCampo />} />
 
-          {/* Asistencia local: SOLO admin */}
           <Route
             path="asistencia-local"
             element={
-              <ProtectedRoute
-                allowedRoles={["admin"]}
-                redirectTo="/dashboard"
-              >
+              <ProtectedRoute allowedRoles={["admin"]} redirectTo="/dashboard">
                 <AsistenciaLocal />
               </ProtectedRoute>
             }
           />
 
-          {/* Agregar usuario: SOLO admin */}
           <Route
             path="agregar-usuario"
             element={
-              <ProtectedRoute
-                allowedRoles={["admin"]}
-                redirectTo="/dashboard"
-              >
+              <ProtectedRoute allowedRoles={["admin"]} redirectTo="/dashboard">
                 <AgregarUsuario />
               </ProtectedRoute>
             }
           />
         </Route>
 
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </SessionGuard>

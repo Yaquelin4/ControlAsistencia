@@ -1,13 +1,18 @@
 // src/components/Layout/Sidebar.jsx
 import { NavLink, useNavigate } from "react-router-dom";
-import { MdOutlineDashboard } from "react-icons/md";
+import { MdOutlineDashboard, MdLocationPin, MdClose } from "react-icons/md";
 import { FaCarTunnel } from "react-icons/fa6";
-import { MdLocationPin } from "react-icons/md";
 import { IoPersonAddSharp, IoExit } from "react-icons/io5";
+import { TfiAngleDoubleLeft, TfiAngleDoubleRight } from "react-icons/tfi";
 import { useAuth } from "../../contexts/loginContext";
 import "./sidebar.css";
 
-export default function Sidebar() {
+export default function Sidebar({
+  isMobileOpen,
+  isCollapsed,
+  onCloseMobile,
+  onToggleCollapse,
+}) {
   const { logout, role, managerCode } = useAuth();
   const navigate = useNavigate();
 
@@ -25,66 +30,94 @@ export default function Sidebar() {
   };
 
   const panelTitle = isAdmin
-    ? "PANEL ADMIN"
+    ? "PANEL DEL ADMINISTRADOR"
     : isManager
-    ? "PANEL MANAGER"
-    : "PANEL PRINCIPAL";
+      ? "PANEL: ENCARGADO DE AREA"
+      : "PANEL: VISTA ";
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar__role">
-        {panelTitle}
-        {isManager && managerCode ? (
-          <div className="sidebar__subrole">{managerCode}</div>
-        ) : null}
+    <aside
+      className={`sidebar ${isMobileOpen ? "open" : ""} ${isCollapsed ? "collapsed" : ""}`}
+    >
+      <div className="sidebar__top">
+        <div className="sidebar__role-wrap">
+          {!isCollapsed && (
+            <div className="sidebar__role">
+              {panelTitle}
+              {isManager && managerCode ? (
+                <div className="sidebar__subrole">{managerCode}</div>
+              ) : null}
+            </div>
+          )}
+        </div>
+
+        <div className="sidebar__actions">
+          <button
+            type="button"
+            className="sidebar__collapse desktop-only"
+            onClick={onToggleCollapse}
+            aria-label={isCollapsed ? "Abrir barra lateral" : "Cerrar barra lateral"}
+            title={isCollapsed ? "Abrir barra lateral" : "Cerrar barra lateral"}
+          >
+            {isCollapsed ? <TfiAngleDoubleRight /> : <TfiAngleDoubleLeft />}
+          </button>
+
+          <button
+            type="button"
+            className="sidebar__close mobile-only"
+            onClick={onCloseMobile}
+            aria-label="Cerrar menú"
+          >
+            <MdClose />
+          </button>
+        </div>
       </div>
 
       <nav className="sidebar__nav">
-        {/* 1) Dashboard (admin + manager) */}
         <NavLink
           to="/dashboard"
           end
           className={({ isActive }) => (isActive ? "navbtn active" : "navbtn")}
+          onClick={onCloseMobile}
         >
           <MdOutlineDashboard className="navbtn__icon" />
-          Dashboard
+          {!isCollapsed && <span>Dashboard</span>}
         </NavLink>
 
-        {/* 2) Salidas solicitadas (admin + manager) */}
         <NavLink
           to="/asistencia-campo"
           className={({ isActive }) => (isActive ? "navbtn active" : "navbtn")}
+          onClick={onCloseMobile}
         >
           <FaCarTunnel className="navbtn__icon" />
-          Salidas solicitadas
+          {!isCollapsed && <span>Salidas solicitadas</span>}
         </NavLink>
 
-        {/* 3) Asistencia local (solo admin) */}
-        {isAdmin ? (
+        {isAdmin && (
           <NavLink
             to="/asistencia-local"
             className={({ isActive }) => (isActive ? "navbtn active" : "navbtn")}
+            onClick={onCloseMobile}
           >
             <MdLocationPin className="navbtn__icon" />
-            Asistencia Local
+            {!isCollapsed && <span>Asistencia Local</span>}
           </NavLink>
-        ) : null}
+        )}
 
-        {/* 4) Agregar usuario (solo admin) */}
-        {isAdmin ? (
+        {isAdmin && (
           <NavLink
             to="/agregar-usuario"
             className={({ isActive }) => (isActive ? "navbtn active" : "navbtn")}
+            onClick={onCloseMobile}
           >
             <IoPersonAddSharp className="navbtn__icon" />
-            Agregar Usuario
+            {!isCollapsed && <span>Agregar Usuario</span>}
           </NavLink>
-        ) : null}
+        )}
 
-        {/* 5) Salir */}
         <button type="button" className="navbtn logout" onClick={handleLogout}>
           <IoExit className="navbtn__icon" />
-          Salir
+          {!isCollapsed && <span>Salir</span>}
         </button>
       </nav>
     </aside>
