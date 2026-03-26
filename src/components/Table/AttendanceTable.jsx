@@ -25,8 +25,35 @@ export default function AttendanceTable({
     return row[column.key];
   };
 
+  const isPrimitive = (value) =>
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean";
+
+  const wrapNoTranslate = (value) => {
+    if (React.isValidElement(value)) return value;
+
+    if (isPrimitive(value)) {
+      return (
+        <span className="notranslate" translate="no">
+          {String(value)}
+        </span>
+      );
+    }
+
+    if (value == null) {
+      return (
+        <span className="notranslate" translate="no">
+          -
+        </span>
+      );
+    }
+
+    return value;
+  };
+
   return (
-    <div className="att-card">
+    <div className="att-card notranslate" translate="no">
       {(toolbarLeft || toolbarRight || onExport) && (
         <div className="att-toolbar">
           <div className="att-toolbar__left">{toolbarLeft}</div>
@@ -87,20 +114,25 @@ export default function AttendanceTable({
             {!loading &&
               rows.map((row, idx) => (
                 <tr key={keyGetter(row, idx)}>
-                  {columns.map((c) => (
-                    <td
-                      key={c.key}
-                      style={{ textAlign: c.align || "left" }}
-                      className={c.ellipsis ? "ellipsis" : undefined}
-                      title={
-                        c.ellipsis && typeof row[c.key] !== "object"
-                          ? String(row[c.key] ?? "")
-                          : undefined
-                      }
-                    >
-                      {renderCellValue(row, c)}
-                    </td>
-                  ))}
+                  {columns.map((c) => {
+                    const rawValue = renderCellValue(row, c);
+                    const cellTitle =
+                      c.ellipsis && !React.isValidElement(rawValue) && rawValue != null
+                        ? String(rawValue)
+                        : undefined;
+
+                    return (
+                      <td
+                        key={c.key}
+                        style={{ textAlign: c.align || "left" }}
+                        className={c.ellipsis ? "ellipsis notranslate" : "notranslate"}
+                        title={cellTitle}
+                        translate="no"
+                      >
+                        {wrapNoTranslate(rawValue)}
+                      </td>
+                    );
+                  })}
 
                   {actions && <td className="actions">{actions(row)}</td>}
                 </tr>
@@ -135,16 +167,27 @@ export default function AttendanceTable({
 
           {!loading &&
             rows.map((row, idx) => (
-              <div className="att-mobile-card" key={keyGetter(row, idx)}>
+              <div
+                className="att-mobile-card notranslate"
+                translate="no"
+                key={keyGetter(row, idx)}
+              >
                 <div className="att-mobile-card__body">
-                  {columns.map((c) => (
-                    <div className="att-mobile-item" key={c.key}>
-                      <div className="att-mobile-item__label">{c.header}</div>
-                      <div className="att-mobile-item__value">
-                        {renderCellValue(row, c)}
+                  {columns.map((c) => {
+                    const rawValue = renderCellValue(row, c);
+
+                    return (
+                      <div className="att-mobile-item" key={c.key}>
+                        <div className="att-mobile-item__label">{c.header}</div>
+                        <div
+                          className="att-mobile-item__value notranslate"
+                          translate="no"
+                        >
+                          {wrapNoTranslate(rawValue)}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {actions && (

@@ -295,6 +295,10 @@
 .att-mobile-state {
   padding: 10px 0;
 }
+.notranslate {
+  -webkit-translate: no;
+  translate: no;
+}
 
 /* tablet */
 @media (max-width: 1024px) {
